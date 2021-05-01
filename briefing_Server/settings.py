@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+#ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['3.35.133.16']
 
 # Application definition
 
@@ -85,11 +87,11 @@ WSGI_APPLICATION = 'briefing_Server.wsgi.application'
 
 DATABASES = {
     'default': {
-        'NAME': 'briefing_DB',
+        'NAME': 'briefing',
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'root',
-        'PASSWORD': 'kang4506',
-        'HOST': '127.0.0.1',
+        'USER': 'mesh',
+        'PASSWORD': 'briefing2017!!',
+        'HOST': 'briefing.ctrolnkjss92.ap-northeast-2.rds.amazonaws.com',
         'PORT': '3306',
     },
 }
