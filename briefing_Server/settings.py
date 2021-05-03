@@ -28,7 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 #ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-ALLOWED_HOSTS = ['3.35.133.16']
+ALLOWED_HOSTS = ['3.34.182.61']
 
 # Application definition
 
@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'briefing_Server.wsgi.application'
 
 DATABASES = {
     'default': {
-        'NAME': 'briefing',
+        'NAME': 'briefing_DB',
         'ENGINE': 'django.db.backends.mysql',
         'USER': 'mesh',
         'PASSWORD': 'briefing2017!!',
@@ -135,7 +135,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

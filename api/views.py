@@ -25,7 +25,7 @@ class SignIn(View):
 
                 if bcrypt.checkpw(data['user_pw'].encode('UTF-8'), user_data.user_pw.encode('UTF-8')):
                     token = jwt.encode({'user_id' : user_data.user_id}, SECRET_KEY, algorithm='HS256')
-                    return JsonResponse({'success' : True, 'message' : "성공입니다.","token": token}, status=200)
+                    return JsonResponse({'success' : True, 'message' : "성공", "token": token}, status=200)
                 return JsonResponse({'success' : False, 'message' : "Wrong Password"}, status=401)
             return JsonResponse({'success' : False,'message' : "No ID"},status=400)
         except KeyError:
@@ -38,15 +38,15 @@ class SignUp(View):
 
         try:
             if user.objects.filter(user_id=data["user_id"]).exists():
-                return JsonResponse({"message" : "EXISTS_ID"}, status=400)
+                return JsonResponse({"status" : 400,"message" : "EXISTS_ID"}, status=400)
 
             user.objects.create(
                 user_id = data['user_id'],
                 user_pw = bcrypt.hashpw(data['user_pw'].encode('UTF-8'), bcrypt.gensalt()).decode('UTF-8')
             ).save()
-            return JsonResponse({"success" : True, "message" : "성공입니다","data" : data}, status=200)
+            return JsonResponse({"status" : 200,"message" : "성공","data" : data}, status=200)
         except KeyError:
-            return JsonResponse({'message': "INVALID_KEYS"}, status=400)
+            return JsonResponse({"status" : 400,'message': "INVALID_KEYS"}, status=400)
 
 
 # 아래코드들은
@@ -59,7 +59,7 @@ def user_list(request):
     if request.method == 'GET':
         query_set = user.objects.all()
         serializer = UserSerializer(query_set, many=True)
-        return JsonResponse({'data' : serializer.data}, status=200)
+        return JsonResponse({"status" : 200, 'data' : serializer.data}, status=200)
 
 
 # 사용자별 영상 분석 기록 리스트 + 히스토리에서 아이템 클릭시 상세화면 정보를 보내줄 api 구현 필요
@@ -143,4 +143,4 @@ def ex(request):
         #     'time' : crawling_data.time
         # }
 
-        return JsonResponse({'success' : True, 'message' : '성공입니다.', 'data':crawling_data}, status=200)
+        return JsonResponse({"status" : 200, 'message' : '성공', 'data':crawling_data}, status=200)
