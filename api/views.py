@@ -9,6 +9,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 
+# from api.comment import comment_predict
 from api.info import video_info
 from api.models import user
 from api.serializers import UserSerializer
@@ -144,3 +145,12 @@ def ex(request):
         # }
 
         return JsonResponse({"status" : 200, 'message' : '성공', 'data':crawling_data}, status=200)
+
+
+# @csrf_exempt
+# def comment_predict_method(request):
+#     if request.method == 'POST':
+#         url_data = JSONParser().parse(request)
+#         comment = comment_predict(url_data.get('url'))
+#
+#        return JsonResponse({'success': True, 'message': '성공입니다.', 'data': comment}, status=200)

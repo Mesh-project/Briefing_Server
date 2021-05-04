@@ -9,4 +9,5 @@ urlpatterns = [
     # path('history/<int:pk>/',views.history_list),
     # path('analysis/', views.analysis_view),
     path('ex/', views.ex),
+    # path('comment/', views.comment_predict_method)
 ]
