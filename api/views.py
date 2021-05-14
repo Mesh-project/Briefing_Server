@@ -1,6 +1,7 @@
 import json
 
 import bcrypt as bcrypt
+from api.comment_model import comment_predict
 from django.http import JsonResponse, HttpResponse
 import jwt
 
@@ -10,9 +11,10 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 
 # from api.comment import comment_predict
+
 from api.info import video_info
-from api.models import user
-from api.serializers import UserSerializer
+from api.models import user, analysis
+from api.serializers import UserSerializer, AnalysisSerializer
 from briefing_Server.settings import SECRET_KEY
 
 # 로그인
@@ -62,95 +64,57 @@ def user_list(request):
         serializer = UserSerializer(query_set, many=True)
         return JsonResponse({"status" : 200, 'data' : serializer.data}, status=200)
 
-
-# 사용자별 영상 분석 기록 리스트 + 히스토리에서 아이템 클릭시 상세화면 정보를 보내줄 api 구현 필요
-# @csrf_exempt
-# def history_list(request, pk):
-#     obj = model_analysis.objects.get(pk=pk)
-#     if request.method == 'GET':
-#         serializer = AnalysisSerializer(obj)
-#         # DB에 저장되는 부분이 아니라 즉각적으로 분석하고 바로 클라이언트에 보내줄 데이터(일시적인 데이터)
-#         comment_data = {
-#             'bad_comment': [
-#                 "못생겼다.", "재미없다. 이딴 거 할 시간에 잠이나 자라.", "멍청하게 생김", "이러니까 나라가 망하지 ㅉㅉ"
-#             ],
-#             'good_comment': [
-#                 "영상 재밌게 보고 갑니다.", "유익한 정보인 것 같아요.", "아직도 살만한 세상이네요."
-#             ],
-#             'english_comment' : [
-#                 "this is very funny video.", "I think that is not good"
-#             ],
-#             'chinese_comment' : [
-#                 "中國語", "玩得很尽兴"
-#             ],
-#             'etc_comment' : [
-#                 "とても陽気", "أهلا"
-#             ]
-#         }
-#         return JsonResponse({'data' : serializer.data, 'comment_data' : comment_data}, status=200)
-
-
-
-# 영상 url을 통한 분석 데이터 저장 및 결과값 return
-# @csrf_exempt
-# def analysis_view(request):
-#     if request.method == 'POST':
-#         data = JSONParser().parse(request)
-#
-#         analysis_data = {
-#             'user_idx' : data.get('user_idx'),
-#             'url' : data.get('url'),
-#             'title' : "크롤링한 제목",
-#             'thumbnail' : "https://onaliternote.files.wordpress.com/2016/11/wp-1480230666843.jpg",
-#             'channel_name' : "크롤링한 채널명",
-#             'video_time' : "01:00:00",
-#             'video_date' : "2021.01.01",
-#             'topic' : "주제 분석 결과",
-#             'graph_language' : "50,30,10,10",
-#             'graph_bad_comment' : "65,35"
-#         }
-#         #DB에 저장되는 부분이 아니라 즉각적으로 분석하고 바로 클라이언트에 보내줄 데이터(일시적인 데이터)
-#         comment_data = {
-#             'bad_comment' : [
-#                 "못생겼다.", "재미없다. 이딴 거 할 시간에 잠이나 자라.", "멍청하게 생김", "이러니까 나라가 망하지 ㅉㅉ"
-#             ],
-#             'good_comment' : [
-#                 "영상 재밌게 보고 갑니다.", "유익한 정보인 것 같아요.", "아직도 살만한 세상이네요."
-#             ]
-#         }
-#         serializer = AnalysisSerializer(data=analysis_data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return JsonResponse({
-#                 'success': True,
-#                 'message': '성공입니다.',
-#                 'data': analysis_data,
-#                 'comment_data' : comment_data
-#             }, status=200)
-#     return JsonResponse(serializer.errors, status=400)
+@csrf_exempt
+def get_history(request):
+    if request.method == 'GET':
+        query_set = analysis.objects.all()
+        serializer = AnalysisSerializer(query_set, many=True)
+        return JsonResponse({"status" : 200, 'data' : serializer.data}, status=200)
 
 
 @csrf_exempt
-def ex(request):
+def get_analysis(request):
+    data = json.loads(request.body)
+
     if request.method == 'POST':
         url_data = JSONParser().parse(request)
         crawling_data = video_info(url_data.get('url'))
 
-        # info_data = {
-        #     'title' : crawling_data.title,
-        #     'author' : crawling_data.author,
-        #     'published' : crawling_data.published,
-        #     'thumnail' : crawling_data.thumbnail,
-        #     'time' : crawling_data.time
-        # }
+        analysis.objects.create(
+            #user_idx=1,
+            url=data['url'],
+            title=crawling_data.get('title'),
+            thumbnail=crawling_data.get('thumbnail'),
+            channel_name=crawling_data.get('author'),
+            video_time=crawling_data.get('video_time'),
+            topic="한국 경제 전망이 밝아진 것은 세계 경제 회복 영향이 큰 것으로 풀이된다. "
+                  "실제 OECD는 이날 올해 세계 경제성장률 전망치를 종전(42)보다 14포인트나 올려 잡았다. "
+                  "OECD는 코로나19 백신 접종 확대와 주요국의 추가 재정 부양책 등으로 세계 경제 성장세가 확대될 것이라고 내다봤다. "
+                  "OECD는 미국 성장률 전망치를 종전 32에서 65로 끌어올렸다. "
+                  "이른바 백신 효과에 세계 경제 회복 속도가 빨라지리란 전망이 확산되고 있다"
 
-        return JsonResponse({"status" : 200, 'message' : '성공', 'data':crawling_data}, status=200)
+        ).save()
+        info_data = {
+            'user_idx' : 1,
+            'url' : data['url'],
+            'analysis_date' : "2020-01-01",
+            'title' : crawling_data.get('title'),
+            'thumnail' : crawling_data.get('thumbnail'),
+            'channel_name': crawling_data.get('author'),
+            'video_time' : crawling_data.get('video_time'),
+            'topic' : "한국 경제 전망이 밝아진 것은 세계 경제 회복 영향이 큰 것으로 풀이된다. "
+                  "실제 OECD는 이날 올해 세계 경제성장률 전망치를 종전(42)보다 14포인트나 올려 잡았다. "
+                  "OECD는 코로나19 백신 접종 확대와 주요국의 추가 재정 부양책 등으로 세계 경제 성장세가 확대될 것이라고 내다봤다. "
+                  "OECD는 미국 성장률 전망치를 종전 32에서 65로 끌어올렸다. "
+                  "이른바 백신 효과에 세계 경제 회복 속도가 빨라지리란 전망이 확산되고 있다"
+        }
+        return JsonResponse({"status" : 200, 'message' : '성공', 'data':info_data}, status=200)
 
 
-# @csrf_exempt
-# def comment_predict_method(request):
-#     if request.method == 'POST':
-#         url_data = JSONParser().parse(request)
-#         comment = comment_predict(url_data.get('url'))
-#
-#        return JsonResponse({'success': True, 'message': '성공입니다.', 'data': comment}, status=200)
+@csrf_exempt
+def get_comment(request):
+    if request.method == 'POST':
+        url_data = JSONParser().parse(request)
+        comment = comment_predict(url_data.get('url'))
+
+    return JsonResponse({'success': True, 'message': 'Success.', 'korean_data': comment[0].to_dict(), 'etc_data': comment[1].to_dict()}, status=200)
