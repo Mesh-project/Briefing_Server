@@ -4,11 +4,11 @@
  - 강수빈
 
 
-<Function>
-- Signin / Signup
-- Video Crawling
-- STT
-- Commet Analysis (language, positive/negative)
-- Video Topic
-- Analysis Visualization
-- History
+## Function
+- Signin / Signup</br>
+- Video Info Crawling</br>
+- STT</br>
+- Commet Analysis (language, positive/negative)</br>
+- Video Topic</br>
+- Analysis Visualization</br>
+- History</br>
