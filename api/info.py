@@ -11,8 +11,6 @@ def video_info(url):
     thumbnail = v.thumb
     time = v.duration
 
-    print(thumbnail)
-    print(author)
 
     f = dict(user_idx=1, url = url, title = title, thumbnail = thumbnail, author = author, published = published,  video_time = time, topic = "한국 경제 전망이 밝아진 것은 세계 경제 회복 영향이 큰 것으로 풀이된다. "
                   "실제 OECD는 이날 올해 세계 경제성장률 전망치를 종전(42)보다 14포인트나 올려 잡았다. "

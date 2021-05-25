@@ -149,12 +149,11 @@ def comment_predict(video_id):
         pad_new = pad_sequences(encoded, maxlen=30)  # 패딩
         score = float(loaded_model.predict(pad_new))  # 예측
         if (score > 0.5):
-            print("{:.2f}% 확률로 긍정 리뷰입니다.\n".format(score * 100)) #1
+            # print("{:.2f}% 확률로 긍정 리뷰입니다.\n".format(score * 100)) #1
             return predict_list.append("{:.2f}% 확률로 긍정 리뷰입니다.".format(score * 100))
         else:
-            print("{:.2f}% 확률로 부정 리뷰입니다.\n".format((1 - score) * 100)) #0
+            # print("{:.2f}% 확률로 부정 리뷰입니다.\n".format((1 - score) * 100)) #0
             return predict_list.append("{:.2f}% 확률로 부정 리뷰입니다.".format((1 - score) * 100))
-
 
 
     print("===============================")
@@ -177,10 +176,9 @@ def comment_predict(video_id):
     not_korean = df['sort'] != '한국어'
     other_language = df[not_korean]
 
-    js_korean = korean.to_json(orient='index', force_ascii=False)
-    js_other = other_language.to_json(orient='index', force_ascii=False)
+    # js_korean = korean.to_json(orient='index', force_ascii=False)
+    # js_other = other_language.to_json(orient='index', force_ascii=False)
 
     comment_array = [korean, other_language]
 
-    print(comment_array)
     return comment_array

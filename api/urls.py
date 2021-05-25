@@ -8,5 +8,6 @@ urlpatterns = [
     path('signup/', views.SignUp.as_view()), # 회원가입
     path('analysis/', views.get_analysis),
     path('comment/', views.get_comment),
-    path('history/', views.get_history)
+    path('history/<int:user_index>', views.get_history),
+    # path('stt/', views.s3_stt)
 ]
