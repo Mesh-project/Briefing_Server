@@ -1,9 +1,11 @@
+from __future__ import print_function
 import json
+import os
 
 import boto3
 
 from api.comment_model import comment_predict
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 import jwt
 
 # Create your views here.
@@ -16,12 +18,17 @@ from rest_framework.parsers import JSONParser
 from api.info import video_info
 from api.models import user, analysis
 from api.serializers import UserSerializer, AnalysisSerializer
-from api.stt import stt_mp4
-from briefing_Server.settings import SECRET_KEY, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 
+
+import time
+import boto3
 
 # 로그인
 # test용 로그인 (user_id: "test", user_pw: "1234")
+from api.s3 import stt_mp4
+from briefing_Server.settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+
+
 class SignIn(View):
     def post(self, request):
         data = json.loads(request.body)
@@ -77,7 +84,8 @@ def get_history(request, user_index):
 
 @csrf_exempt
 def get_analysis(request):
-    data = json.loads(request.body)
+    #data = json.loads(request.body)
+    # global data, url_data, idx_data, crawling_data, info_data
 
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -143,23 +151,53 @@ def get_comment(request):
 
     return JsonResponse({'success': True, 'message': 'Success.', 'korean_data': comment[0].to_dict(orient='records'), 'etc_data': comment[1].to_dict(orient='records')}, status=200)
 
+import io
 
-# @csrf_exempt
-# def s3_stt(request):
-#     if request.method == 'POST':
-#         data = JSONParser().parse(request)
-#         voice_stt = stt_mp4(data.get('url'))
-#
-#         bucket = boto3.resource('s3')
-#
-#         s3_client = boto3.client(
-#             's3',
-#             aws_access_key_id = AWS_ACCESS_KEY_ID,
-#             aws_secret_access_key = AWS_SECRET_ACCESS_KEY
-#         )
-#
-#         name = "stt_sample"
-#
-#         s3_client.upload_file(voice_stt, bucket, str(name))
-#
-#         return HttpResponse({'success': True, 'message': '성공입니다.'}, status=200)
+@csrf_exempt
+def s3_stt(request):
+    if request.method == 'POST':
+        data = JSONParser().parse(request)
+        print("12121212121212121212121")
+        voice_stt = stt_mp4(data.get('url'))
+        file_name = voice_stt.default_filename
+        voice_stt.download()
+
+        bucket = boto3.resource('s3')
+        print(str(bucket))
+
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id = AWS_ACCESS_KEY_ID,
+            aws_secret_access_key = AWS_SECRET_ACCESS_KEY
+        )
+
+        #name = "stt_sample"
+        #data_buffer = io.BytesIO(voice_stt)
+        print(str(bucket))
+        #print(str(voice_stt))
+        print("어렵다어렵다 어렵다어렵다")
+        s3_client.upload_file(file_name, "meshstt","video.mp3")
+
+        # 삭제 만들 예정
+        os.remove('../'+file_name)
+
+        transcribe = boto3.client('transcribe')
+        job_name = "mesh_test"
+        job_uri = "s3://meshstt/video.mp3"
+
+        transcribe.start_transcription_job(
+            TranscriptionJobName=job_name,
+            Media={'MediaFileUri': job_uri},
+            MediaFormat='mp4',
+            LanguageCode='ko-KR'
+        )
+        while True:
+            status = transcribe.get_transcription_job(TranscriptionJobName=job_name)
+            if status['TranscriptionJob']['TranscriptionJobStatus'] in ['COMPLETED', 'FAILED']:
+                break
+            print("Not ready yet...")
+            time.sleep(5)
+        print(status)
+
+
+        return JsonResponse({'success': True, 'message': '성공입니다.'}, status=200)
