@@ -179,10 +179,10 @@ def s3_stt(request):
         s3_client.upload_file(file_name, "meshstt","video.mp3")
 
         # 삭제 만들 예정
-        os.remove('../'+file_name)
+        #os.remove('../'+file_name)
 
         transcribe = boto3.client('transcribe')
-        job_name = "mesh_test"
+        job_name = "mesh_test_1"
         job_uri = "s3://meshstt/video.mp3"
 
         transcribe.start_transcription_job(
