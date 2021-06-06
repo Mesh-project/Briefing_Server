@@ -19,5 +19,6 @@
 
 
 
- - 김민진
- - 강수빈
+## Member
+- [김민진](https://github.com/kim003512)
+- [강수빈](https://github.com/ksb0511)
