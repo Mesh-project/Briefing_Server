@@ -58,7 +58,7 @@ def word_stt(text):
 
 
     print(str(bucket))
-    # print(str(voice_stt))
+
     print("어렵다어렵다 어렵다어렵다")
     #datetime.datetime.now().date()) + str(datetime.datetime.now().hour)
     #print(datetime.datetime.now().date() + str(datetime.datetime.now().hour))
