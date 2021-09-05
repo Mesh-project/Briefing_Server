@@ -56,7 +56,7 @@ def word_stt(text):
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
     )
 
-    # name = "stt_sample"
+
     # data_buffer = io.BytesIO(voice_stt)
     print(str(bucket))
     # print(str(voice_stt))
