@@ -57,7 +57,6 @@ def word_stt(text):
     )
 
 
-    # data_buffer = io.BytesIO(voice_stt)
     print(str(bucket))
     # print(str(voice_stt))
     print("어렵다어렵다 어렵다어렵다")
