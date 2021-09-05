@@ -8,6 +8,7 @@
 - Signin / Signup</br>
 - Video Info Crawling</br>
 - STT</br>
+- Word Cloud</br>
 - Commet Analysis (language, positive/negative)</br>
 - Video Topic</br>
 - Analysis Visualization</br>
