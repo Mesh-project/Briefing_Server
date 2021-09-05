@@ -161,8 +161,6 @@ def get_analysis(request):
 
         print(transcribe_text)
 
-        # job = status['TranscriptionJob']['Transcript']
-        # print("Got job %s.", job['TranscriptFileUri'])
 
         topic_result = Topic(transcribe_text)
 
@@ -294,9 +292,6 @@ def s3_stt(request):
         transcribe_text = literal_eval(rst)['results']['transcripts'][0]['transcript']
 
         print(transcribe_text)
-
-        # job = status['TranscriptionJob']['Transcript']
-        # print("Got job %s.", job['TranscriptFileUri'])
 
         topic = Topic(transcribe_text)
         # print(str(topic))
