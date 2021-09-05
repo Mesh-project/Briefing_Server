@@ -68,7 +68,6 @@ def word_stt(text):
 
 
     return [str_png, [words[0],words[1],words[2]]]
-    # return plt.
 
 
 
