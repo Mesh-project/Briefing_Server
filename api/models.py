@@ -19,3 +19,6 @@ class analysis(models.Model):
     channel_name = models.CharField(max_length=100)
     video_time = models.CharField(max_length=20)
     topic = models.CharField(max_length=300)
+    script = models.CharField(max_length=10000)
+    wordcloud = models.CharField(max_length=100)
+    topword = models.CharField(max_length=100)

@@ -97,26 +97,45 @@ def comment_predict(video_id):
     is_korean = df['sort'] == '한국어'
     korean = df[is_korean]
 
+    print(korean)
+
     okt = Okt()
+
+    print(Okt)
 
     #데이터 정제
     korean[0].nunique(), korean[1].nunique(), korean['sort'].nunique()
+
+    print("데이터 정제")
+
     text = 'do!!! you expect... people~ to~ read~ the FAQ, etc. and actually accept hard~! atheism?@@'
     re.sub(r'[^a-zA-Z ]', '', text)  # 알파벳과 공백을 제외하고 모두 제거
+
+    print("22222222222222")
 
     korean[0] = korean[0].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]", "")
     korean[0].replace('', pandas.np.nan, inplace=True)
     korean = korean.dropna(how='any')
 
+    print("3333333333333")
+
     X_train = []
     for sentence in korean[0]:
         temp_X = []
+        print("xxxxxxxxxxx")
+        print(sentence)
+
         temp_X = okt.morphs(sentence, stem=True)  # 토큰화
+        print("yyyyyyyyyyyy")
         temp_X = [word for word in temp_X if not word in stopwords]  # 불용어 제거
         X_train.append(temp_X)
 
+        print("444444444444")
+
     tokenizer = Tokenizer()
     tokenizer.fit_on_texts(X_train)
+
+    print("555555555")
 
     threshold = 3
     total_cnt = len(tokenizer.word_index)  # 단어의 수
@@ -150,10 +169,10 @@ def comment_predict(video_id):
         score = float(loaded_model.predict(pad_new))  # 예측
         if (score > 0.5):
             # print("{:.2f}% 확률로 긍정 리뷰입니다.\n".format(score * 100)) #1
-            return predict_list.append("{:.2f}% 확률로 긍정 리뷰입니다.".format(score * 100))
+            return predict_list.append("{:.2f}% 긍정".format(score * 100))#predict_list.append("{:.2f}% 확률로 긍정 리뷰입니다.".format(score * 100))
         else:
             # print("{:.2f}% 확률로 부정 리뷰입니다.\n".format((1 - score) * 100)) #0
-            return predict_list.append("{:.2f}% 확률로 부정 리뷰입니다.".format((1 - score) * 100))
+            return predict_list.append("{:.2f}% 부정".format(score * 100))#predict_list.append("{:.2f}% 확률로 부정 리뷰입니다.".format((1 - score) * 100))
 
 
     print("===============================")
@@ -176,9 +195,34 @@ def comment_predict(video_id):
     not_korean = df['sort'] != '한국어'
     other_language = df[not_korean]
 
-    # js_korean = korean.to_json(orient='index', force_ascii=False)
-    # js_other = other_language.to_json(orient='index', force_ascii=False)
+    korean_dict = korean.to_dict(orient='records')
+
+    english = df['sort'] == '영어'
+    english_dict = df[english].to_dict(orient='records')
+
+    etc = df['sort'] == '그외'
+    etc_dict = df[etc].to_dict(orient='records')
 
     comment_array = [korean, other_language]
 
-    return comment_array
+    korean_count = len(korean_dict)
+    eng_count = len(english_dict)
+    etc_count = len(etc_dict)
+
+    positive=0
+    negative=0
+
+    for i in range (0,korean_count):
+        if korean_dict[i].get('predict')==("긍정") :
+            positive=positive+1
+        else :
+            negative=negative+1
+    # print(korean_dict)
+    #
+    # positive = len(korean_dict['predict']==("긍정"))
+    # negative = len(korean_dict['predict']==("부정"))
+    comment_count = [korean_count, eng_count, etc_count, positive, negative]
+
+    return {'korean_dict' : korean.to_dict(orient='records'),'etc_dict' : other_language.to_dict(orient='records'), 'comment_count' : comment_count}
+
+

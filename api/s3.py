@@ -1,4 +1,5 @@
 from pytube import YouTube
+# from urllib.request import URLError, HTTPError
 
 def stt_mp4(url):
     print("stt_mp4 함수 입장")

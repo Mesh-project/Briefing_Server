@@ -1,12 +1,12 @@
 from __future__ import print_function
 import json
-import os
+import urllib
+from ast import literal_eval
 
-import boto3
+import datetime
 
 from api.comment_model import comment_predict
 from django.http import JsonResponse
-import jwt
 
 # Create your views here.
 from django.views import View
@@ -18,6 +18,7 @@ from rest_framework.parsers import JSONParser
 from api.info import video_info
 from api.models import user, analysis
 from api.serializers import UserSerializer, AnalysisSerializer
+from urllib import request
 
 
 import time
@@ -26,7 +27,9 @@ import boto3
 # 로그인
 # test용 로그인 (user_id: "test", user_pw: "1234")
 from api.s3 import stt_mp4
-from briefing_Server.settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+from api.topic import Topic
+from api.word_cloud import word_stt
+from briefing_Server.settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION
 
 
 class SignIn(View):
@@ -81,34 +84,87 @@ def get_history(request, user_index):
         serializer = AnalysisSerializer(index_data, many=True)
         return JsonResponse({"status" : 200, 'data' : serializer.data}, status=200)
 
+@csrf_exempt
+def get_history_detail(request, history_idx):
+    if request.method == 'GET':
+        index_data = analysis.objects.filter(analysis_idx=history_idx).values()
+        serializer = AnalysisSerializer(index_data, many=True)
+        return JsonResponse({"status": 200, 'data': serializer.data[0]}, status=200)
+
 
 @csrf_exempt
 def get_analysis(request):
-    #data = json.loads(request.body)
-    # global data, url_data, idx_data, crawling_data, info_data
 
     if request.method == 'POST':
         data = json.loads(request.body)
-        url_data = data['url'] #JSONParser().parse(request)
-        print(url_data)
-        idx_data = data['user_idx']
-        crawling_data = video_info(url_data)
+        url_data_analysis = data.get('url')#.split('=') #JSONParser().parse(request)
+        url_data_analysis=url_data_analysis[32:]#=url_data_analysis.replace("https://www.youtube.com/watch?v=","")
+        print(url_data_analysis)
 
-        # token = request.META.get('HTTP_AUTHORIZATION')
-        # id_token = request.headers['Authorization']
-        # print(type(id_token))
-        # print(id_token)
-        #
-        # byte_token = bytes(id_token, 'utf-8')
-        # print(byte_token)
-        #
-        # dict_data = {'token' : byte_token.decode('utf-8')}
-        # print(dict_data['token'])
-        #
-        # result = jwt.decode(dict_data['token'], SECRET_KEY, algorithms='HS256')
-        #
-        # print(result)
-        # print(type(result))
+        idx_data = data['user_idx']
+        crawling_data = video_info(url_data_analysis)
+
+        voice_stt = stt_mp4(data.get('url'))
+        print("jkljkljlk")
+        file_name = voice_stt.default_filename
+        voice_stt.download()
+
+        bucket = boto3.resource('s3')
+        print(str(bucket))
+
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id=AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=AWS_SECRET_ACCESS_KEY
+        )
+
+        s3_client.upload_file(file_name, "meshstt", "video.mp3")
+
+        # 삭제 만들 예정
+        # os.remove('../'+file_name)
+
+        transcribe = boto3.client('transcribe')
+        job_name = str(datetime.datetime.now().date()) + str(datetime.datetime.now().hour) + str(
+            datetime.datetime.now().minute)
+        job_uri = "s3://meshstt/video.mp3"
+
+        transcribe.start_transcription_job(
+            TranscriptionJobName=job_name,
+            Media={'MediaFileUri': job_uri},
+            MediaFormat='mp4',
+            LanguageCode='ko-KR'
+        )
+        while True:
+            status = transcribe.get_transcription_job(TranscriptionJobName=job_name)
+            if status['TranscriptionJob']['TranscriptionJobStatus'] in ['COMPLETED', 'FAILED']:
+                save_json_uri = status['TranscriptionJob']['Transcript']['TranscriptFileUri']
+                break
+            print("Not ready yet...")
+            time.sleep(5)
+
+        # Transcribe 결과가 저장된 웹주소
+        save_json_uri = status['TranscriptionJob']['Transcript']['TranscriptFileUri']
+
+        # 웹서버 결과 파이썬으로 불러오기
+        load = urllib.request.urlopen(save_json_uri)
+        confirm = load.status
+        rst = load.read().decode('utf-8')
+
+        # 문자열을 딕셔너리로 변환 후 결과 가져오기
+        transcribe_text = literal_eval(rst)['results']['transcripts'][0]['transcript']
+
+        # word cloud 생성
+        word= word_stt(transcribe_text)
+        word_cloud = word[0]
+        top_word = word[1]
+
+
+        print(transcribe_text)
+
+        # job = status['TranscriptionJob']['Transcript']
+        # print("Got job %s.", job['TranscriptFileUri'])
+
+        topic_result = Topic(transcribe_text)
 
         analysis.user_idx = idx_data
 
@@ -119,26 +175,23 @@ def get_analysis(request):
             thumbnail=crawling_data.get('thumbnail'),
             channel_name=crawling_data.get('author'),
             video_time=crawling_data.get('video_time'),
-            topic="한국 경제 전망이 밝아진 것은 세계 경제 회복 영향이 큰 것으로 풀이된다. "
-                  "실제 OECD는 이날 올해 세계 경제성장률 전망치를 종전(42)보다 14포인트나 올려 잡았다. "
-                  "OECD는 코로나19 백신 접종 확대와 주요국의 추가 재정 부양책 등으로 세계 경제 성장세가 확대될 것이라고 내다봤다. "
-                  "OECD는 미국 성장률 전망치를 종전 32에서 65로 끌어올렸다. "
-                  "이른바 백신 효과에 세계 경제 회복 속도가 빨라지리란 전망이 확산되고 있다"
-
+            topic=topic_result,
+            script=transcribe_text,
+            wordcloud="https://meshstt.s3.ap-northeast-2.amazonaws.com/" + word_cloud,
+            topword= top_word
         ).save()
         info_data = {
             'user_idx' : idx_data,
             'url' : data['url'],
             'analysis_date' : "2020-01-01",
             'title' : crawling_data.get('title'),
-            'thumnail' : crawling_data.get('thumbnail'),
+            'thumbnail' : crawling_data.get('thumbnail'),
             'channel_name': crawling_data.get('author'),
             'video_time' : crawling_data.get('video_time'),
-            'topic' : "한국 경제 전망이 밝아진 것은 세계 경제 회복 영향이 큰 것으로 풀이된다. "
-                  "실제 OECD는 이날 올해 세계 경제성장률 전망치를 종전(42)보다 14포인트나 올려 잡았다. "
-                  "OECD는 코로나19 백신 접종 확대와 주요국의 추가 재정 부양책 등으로 세계 경제 성장세가 확대될 것이라고 내다봤다. "
-                  "OECD는 미국 성장률 전망치를 종전 32에서 65로 끌어올렸다. "
-                  "이른바 백신 효과에 세계 경제 회복 속도가 빨라지리란 전망이 확산되고 있다"
+            'topic' : topic_result,
+            'script' : transcribe_text,
+            'wordcloud' : "https://meshstt.s3.ap-northeast-2.amazonaws.com/" + word_cloud,
+            'topword' : top_word
         }
         return JsonResponse({"status" : 200, 'message' : '성공', 'data':info_data}, status=200)
 
@@ -147,9 +200,17 @@ def get_analysis(request):
 def get_comment(request):
     if request.method == 'POST':
         url_data = JSONParser().parse(request)
-        comment = comment_predict(url_data.get('url'))
+        comment = comment_predict(url_data.get('url')) # 객체 받아와짐
 
-    return JsonResponse({'success': True, 'message': 'Success.', 'korean_data': comment[0].to_dict(orient='records'), 'etc_data': comment[1].to_dict(orient='records')}, status=200)
+        # comment_predict(url_data.get('url')).
+
+    return JsonResponse({'success': True,
+                         'message': 'Success.',
+                         'count': comment.get('comment_count'),
+                         'korean_data': comment.get('korean_dict'),
+                         # 'english_dict': comment.get('english_dict'),
+                         'etc_data' : comment.get('etc_dict')},
+                        status=200)
 
 import io
 
@@ -158,7 +219,12 @@ def s3_stt(request):
     if request.method == 'POST':
         data = JSONParser().parse(request)
         print("12121212121212121212121")
+        # req = urllib.request.Request(data.get('url'))
+        # print(req)
+        # with urllib.request.urlopen(req) as response:
+        #     the_page = response.read()
         voice_stt = stt_mp4(data.get('url'))
+        print("jkljkljlk")
         file_name = voice_stt.default_filename
         voice_stt.download()
 
@@ -168,7 +234,7 @@ def s3_stt(request):
         s3_client = boto3.client(
             's3',
             aws_access_key_id = AWS_ACCESS_KEY_ID,
-            aws_secret_access_key = AWS_SECRET_ACCESS_KEY
+            aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
         )
 
         #name = "stt_sample"
@@ -181,9 +247,23 @@ def s3_stt(request):
         # 삭제 만들 예정
         #os.remove('../'+file_name)
 
+        print("1111111111111")
+
+        print(boto3)
+
+        print(boto3.client('transcribe'))
+
         transcribe = boto3.client('transcribe')
-        job_name = "mesh_test_1"
+
+        print("222222222")
+
+        job_name = str(datetime.datetime.now().date())+str(datetime.datetime.now().hour)+str(datetime.datetime.now().minute)
+
+        print("33333333333333333")
+
         job_uri = "s3://meshstt/video.mp3"
+
+        print("4444444444")
 
         transcribe.start_transcription_job(
             TranscriptionJobName=job_name,
@@ -191,13 +271,35 @@ def s3_stt(request):
             MediaFormat='mp4',
             LanguageCode='ko-KR'
         )
+
+        print("55555555")
+
         while True:
             status = transcribe.get_transcription_job(TranscriptionJobName=job_name)
             if status['TranscriptionJob']['TranscriptionJobStatus'] in ['COMPLETED', 'FAILED']:
+                save_json_uri = status['TranscriptionJob']['Transcript']['TranscriptFileUri']
                 break
             print("Not ready yet...")
             time.sleep(5)
-        print(status)
+
+        # Transcribe 결과가 저장된 웹주소
+        save_json_uri = status['TranscriptionJob']['Transcript']['TranscriptFileUri']
+
+        # 웹서버 결과 파이썬으로 불러오기
+        load = urllib.request.urlopen(save_json_uri)
+        confirm = load.status
+        rst = load.read().decode('utf-8')
+
+        # 문자열을 딕셔너리로 변환 후 결과 가져오기
+        transcribe_text = literal_eval(rst)['results']['transcripts'][0]['transcript']
+
+        print(transcribe_text)
+
+        # job = status['TranscriptionJob']['Transcript']
+        # print("Got job %s.", job['TranscriptFileUri'])
+
+        topic = Topic(transcribe_text)
+        # print(str(topic))
 
 
-        return JsonResponse({'success': True, 'message': '성공입니다.'}, status=200)
+        return JsonResponse({'success': True, 'message': '성공입니다.', 'crawling_data' : transcribe_text}, status=200)
