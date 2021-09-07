@@ -2,7 +2,8 @@
 
 
 ## Environment
-![](https://img.shields.io/badge/Python-3.6.3-blue)
+![](https://img.shields.io/badge/Python-3.6.3-blue) ![](https://img.shields.io/badge/Ubuntu-18.0.4-orange) </br>
+![](https://img.shields.io/badge/Django-3.2.6-green) ![](https://img.shields.io/badge/keras-2.6.0-skyblue) ![](https://img.shields.io/badge/konlpy-0.5.2-yellow)
 
 ## Function
 - Signin / Signup</br>
