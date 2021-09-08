@@ -217,10 +217,7 @@ def s3_stt(request):
     if request.method == 'POST':
         data = JSONParser().parse(request)
         print("12121212121212121212121")
-        # req = urllib.request.Request(data.get('url'))
-        # print(req)
-        # with urllib.request.urlopen(req) as response:
-        #     the_page = response.read()
+
         voice_stt = stt_mp4(data.get('url'))
         print("jkljkljlk")
         file_name = voice_stt.default_filename
@@ -235,15 +232,9 @@ def s3_stt(request):
             aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
         )
 
-        #name = "stt_sample"
-        #data_buffer = io.BytesIO(voice_stt)
         print(str(bucket))
-        #print(str(voice_stt))
         print("어렵다어렵다 어렵다어렵다")
         s3_client.upload_file(file_name, "meshstt","video.mp3")
-
-        # 삭제 만들 예정
-        #os.remove('../'+file_name)
 
         print("1111111111111")
 
@@ -285,7 +276,6 @@ def s3_stt(request):
 
         # 웹서버 결과 파이썬으로 불러오기
         load = urllib.request.urlopen(save_json_uri)
-        confirm = load.status
         rst = load.read().decode('utf-8')
 
         # 문자열을 딕셔너리로 변환 후 결과 가져오기
@@ -293,8 +283,8 @@ def s3_stt(request):
 
         print(transcribe_text)
 
-        topic = Topic(transcribe_text)
-        # print(str(topic))
+        # topic = Topic(transcribe_text)
+        # # print(str(topic))
 
 
         return JsonResponse({'success': True, 'message': '성공입니다.', 'crawling_data' : transcribe_text}, status=200)

@@ -20,23 +20,9 @@ def Topic(readData):
     print(text)
     print("text 출력 완료 ")
 
-    # kkma = Kkma()  # 꼬꼬마는 중복을 제거한다.
-    # print("꼬꼬마는 중복을 제거한다.")
-    # list_sentence = kkma.sentences(text)
-
-    # okt = Okt()
-    #
-    # list_sentence = okt.morphs(text, stem=True)  # 토큰화
-
-    # list_sentence = text
-
     print(text)
     print("list_sentence 출력 완료 ")
 
-    # # split함수 이용한 문장 분리
-    # split_text = cleanText(text1).split('\n')
-
-    # https://chan-lab.tistory.com/24
     tf_idf = TfidfVectorizer()
     tf_idf.fit(text)  # 단어를 학습시킴
 
