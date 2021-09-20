@@ -56,7 +56,11 @@ def Topic(readData):
             print(text[sort_res[i]])
             topic_result = topic_result+text[sort_res[i]]+"."+"\n"
 
-    return topic_result
+    for i in range(0, 10):
+        print(text[sort_res[i]])
+        topic_result_predict = topic_result + text[sort_res[i]] + "." + "\n"
+
+    return [topic_result, topic_result_predict]
 
 # 그래프 생성
 

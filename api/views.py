@@ -17,6 +17,7 @@ from rest_framework.parsers import JSONParser
 
 from api.info import video_info
 from api.models import user, analysis
+from api.script_predict import script_predict
 from api.serializers import UserSerializer, AnalysisSerializer
 from urllib import request
 
@@ -162,7 +163,9 @@ def get_analysis(request):
         print(transcribe_text)
 
 
-        topic_result = Topic(transcribe_text)
+        topic_all = Topic(transcribe_text)
+        topic_result = topic_all[0]
+        script_predict(topic_all[1])
 
         analysis.user_idx = idx_data
 

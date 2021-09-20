@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="ubuntu@52.79.55.149:22" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="ubuntu@54.180.138.216:22" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
       <paths name="ubuntu@3.34.182.61:22">
         <serverdata>
@@ -51,7 +51,21 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="ubuntu@3.37.252.63:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/ubuntu/mesh" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="ubuntu@52.79.55.149:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/ubuntu/mesh" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="ubuntu@54.180.138.216:22">
         <serverdata>
           <mappings>
             <mapping deploy="/home/ubuntu/mesh" local="$PROJECT_DIR$" />

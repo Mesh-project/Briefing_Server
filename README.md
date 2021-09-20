@@ -17,12 +17,11 @@
 
 
 ## Architecture
-<img width="650" alt="matdog" src="https://user-images.githubusercontent.com/57608585/119436967-21657100-bd58-11eb-9c21-1d2af680aba0.png">  
+<img width="650" alt="matdog" src="https://user-images.githubusercontent.com/57608585/119436967-21657100-bd58-11eb-9c21-1d2af680aba0.png">
 
 
 ## Negative/Positive Algorithm
 <img width="330" alt="matdog" src="https://user-images.githubusercontent.com/57608585/132206521-a27f8a0f-3c99-4772-a16f-42397556c42c.png">  
-
 
 
 ## Member

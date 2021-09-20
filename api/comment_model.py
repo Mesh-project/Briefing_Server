@@ -5,7 +5,6 @@ import pandas as pd
 import re
 import html
 from konlpy.tag import Okt
-from rest_framework.utils import json
 from tensorflow.python.keras.preprocessing.sequence import pad_sequences
 from tensorflow.python.keras.preprocessing.text import Tokenizer
 from tensorflow.python.keras.saving.save import load_model
@@ -100,8 +99,7 @@ def comment_predict(video_id):
     print(korean)
 
     okt = Okt()
-
-    print(Okt)
+    print("kkkkkkk")
 
     #데이터 정제
     korean[0].nunique(), korean[1].nunique(), korean['sort'].nunique()
