@@ -5,6 +5,7 @@
 import datetime
 
 import boto3
+import numpy as np
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
@@ -37,9 +38,13 @@ def word_stt(text):
         font_path = '/home/ubuntu/mesh/api/NanumGothic.ttf',
         background_color='white',
         width=1500, height=1000,
+        color_func=color_func,
         max_font_size=500).generate_from_frequencies(top20)
 
     print("xxxxxxxxxxxxxx")
+
+
+    # plt.color_palette("light:#06F", as_cmap=True)
 
     plt.imshow(wordcloud)
     plt.axis('off')
@@ -62,12 +67,15 @@ def word_stt(text):
     print("어렵다어렵다 어렵다어렵다")
     #datetime.datetime.now().date()) + str(datetime.datetime.now().hour)
     #print(datetime.datetime.now().date() + str(datetime.datetime.now().hour))
-    str_png = str(datetime.datetime.now().date()) + str(datetime.datetime.now().hour) + ".png"
+    str_png = str(datetime.datetime.now().date()) + str(datetime.datetime.now().hour) + str(datetime.datetime.now().minute) + str(datetime.datetime.now().second) + ".png"
     s3_client.upload_file("a.png", "meshstt", str_png)
 
 
     return [str_png, list(top20.keys())[0] + " " + list(top20.keys())[1] + " " + list(top20.keys())[2] + " " + list(top20.keys())[3] + " " + list(top20.keys())[4]]
 
+def color_func(word, font_size, position, orientation, random_state=None, **kwargs):
+    return ("hsl({:d},{:d}%, {:d}%)".format(np.random.randint(212, 313), np.random.randint(26, 32),
+                                            np.random.randint(45, 80)))
 
 
 

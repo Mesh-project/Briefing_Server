@@ -211,14 +211,11 @@ def comment_predict(video_id):
     negative=0
 
     for i in range (0,korean_count):
-        if korean_dict[i].get('predict')==("긍정") :
+        if korean_dict[i].get('predict').find("긍정")!=-1 :
             positive=positive+1
         else :
             negative=negative+1
-    # print(korean_dict)
-    #
-    # positive = len(korean_dict['predict']==("긍정"))
-    # negative = len(korean_dict['predict']==("부정"))
+
     comment_count = [korean_count, eng_count, etc_count, positive, negative]
 
     return {'korean_dict' : korean.to_dict(orient='records'),'etc_dict' : other_language.to_dict(orient='records'), 'comment_count' : comment_count}
