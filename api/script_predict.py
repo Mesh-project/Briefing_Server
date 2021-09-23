@@ -61,10 +61,10 @@ def script_predict(sentence):
         score = float(loaded_model.predict(pad_new))  # 예측
         if (score > 0.5):
             # print("{:.2f}% 확률로 긍정 리뷰입니다.\n".format(score * 100)) #1
-            return predict_list.append("{:.2f}% 긍정".format(score * 100))#predict_list.append("{:.2f}% 확률로 긍정 리뷰입니다.".format(score * 100))
+            return predict_list.append("긍정 {:.2f}%".format(score * 100))#predict_list.append("{:.2f}% 확률로 긍정 리뷰입니다.".format(score * 100))
         else:
             # print("{:.2f}% 확률로 부정 리뷰입니다.\n".format((1 - score) * 100)) #0
-            return predict_list.append("{:.2f}% 부정".format(score * 100))#predict_list.append("{:.2f}% 확률로 부정 리뷰입니다.".format((1 - score) * 100))
+            return predict_list.append("부정 {:.2f}%".format(score * 100))#predict_list.append("{:.2f}% 확률로 부정 리뷰입니다.".format((1 - score) * 100))
 
     for i in range(len(X_train)):
         print(i)
@@ -76,3 +76,5 @@ def script_predict(sentence):
 
     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
     print(predict_list)
+
+    return predict_list

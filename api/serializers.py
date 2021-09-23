@@ -12,4 +12,4 @@ class AnalysisSerializer(serializers.ModelSerializer):
     class Meta:
         model = analysis
         fields = ('analysis_idx', 'user_idx', 'url', 'title', 'thumbnail', 'analysis_date', 'channel_name',
-                  'video_time', 'topic', 'script', 'wordcloud', 'topword')
+                  'video_time', 'topic', 'script', 'wordcloud', 'topword', 'script_predict')

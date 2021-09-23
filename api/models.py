@@ -22,3 +22,4 @@ class analysis(models.Model):
     script = models.CharField(max_length=10000)
     wordcloud = models.CharField(max_length=100)
     topword = models.CharField(max_length=100)
+    script_predict = models.CharField(max_length=100)

@@ -1,32 +1,16 @@
-# 파일불러오기
-## 파일 읽기
-# file = open('news.txt', 'r', encoding='UTF8')
-# text1 = file.read()
-# file.close()
 
 # *TF - IDF모델 생성
 import numpy as np
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-# 문장 분리
-from konlpy.tag import Kkma, Okt
-
-
 def Topic(readData):
     text = re.sub('[-=+,#/\?:^$@*\※~&%ㆍ!』\'…》]', '', readData)
     text = text.split('.')
 
-    print(text)
-    print("text 출력 완료 ")
-
-    print(text)
-    print("list_sentence 출력 완료 ")
-
     tf_idf = TfidfVectorizer()
     tf_idf.fit(text)  # 단어를 학습시킴
 
-    print("단어 학습중???")
 
     tf_idf.vocabulary_  # 단어사전을 출력
     sorted(tf_idf.vocabulary_.items())  # 단어사전 정렬
@@ -47,18 +31,17 @@ def Topic(readData):
     if len(sort_res) < 2:
         print(text[sort_res[0]])
         topic_result = text[sort_res[0]]
+        topic_result_predict = topic_result + text[sort_res[0]] + "." + "\n"
     elif len(sort_res) < 3:
         for i in range(0, 2):
             print(text[sort_res[i]])
             topic_result = topic_result+text[sort_res[i]]+"."+"\n"
+            topic_result_predict = topic_result + text[sort_res[i]] + "." + "\n"
     else:
         for i in range(0, 2):
             print(text[sort_res[i]])
             topic_result = topic_result+text[sort_res[i]]+"."+"\n"
-
-    for i in range(0, 10):
-        print(text[sort_res[i]])
-        topic_result_predict = topic_result + text[sort_res[i]] + "." + "\n"
+            topic_result_predict = topic_result + text[sort_res[i]] + "." + "\n"
 
     return [topic_result, topic_result_predict]
 

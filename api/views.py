@@ -165,7 +165,9 @@ def get_analysis(request):
 
         topic_all = Topic(transcribe_text)
         topic_result = topic_all[0]
-        script_predict(topic_all[1])
+        a = script_predict(topic_all[1])
+
+        print(a[0])
 
         analysis.user_idx = idx_data
 
@@ -179,7 +181,8 @@ def get_analysis(request):
             topic=topic_result,
             script=transcribe_text,
             wordcloud="https://meshstt.s3.ap-northeast-2.amazonaws.com/" + word_cloud,
-            topword= top_word
+            topword= top_word,
+            script_predict = a[0]
         ).save()
         info_data = {
             'user_idx' : idx_data,
@@ -192,7 +195,8 @@ def get_analysis(request):
             'topic' : topic_result,
             'script' : transcribe_text,
             'wordcloud' : "https://meshstt.s3.ap-northeast-2.amazonaws.com/" + word_cloud,
-            'topword' : top_word
+            'topword' : top_word,
+            'script_predict' : a[0]
         }
         return JsonResponse({"status" : 200, 'message' : '성공', 'data':info_data}, status=200)
 
