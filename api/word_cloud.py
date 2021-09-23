@@ -66,7 +66,7 @@ def word_stt(text):
     s3_client.upload_file("a.png", "meshstt", str_png)
 
 
-    return [str_png, [list(top20.keys())[0],list(top20.keys())[1],list(top20.keys())[2], list(top20.keys())[3],list(top20.keys())[4]]]
+    return [str_png, list(top20.keys())[0] + " " + list(top20.keys())[1] + " " + list(top20.keys())[2] + " " + list(top20.keys())[3] + " " + list(top20.keys())[4]]
 
 
 
