@@ -5,6 +5,8 @@ from ast import literal_eval
 
 import datetime
 
+from docutils.nodes import comment
+
 from api.comment_model import comment_predict
 from django.http import JsonResponse
 
@@ -216,8 +218,6 @@ def get_comment(request):
                          # 'english_dict': comment.get('english_dict'),
                          'etc_data' : comment.get('etc_dict')},
                         status=200)
-
-import io
 
 @csrf_exempt
 def s3_stt(request):

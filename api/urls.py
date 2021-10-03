@@ -10,5 +10,5 @@ urlpatterns = [
     path('comment/', views.get_comment),
     path('history/<int:user_index>', views.get_history),
     path('stt/', views.s3_stt),
-    path('history_detail/<int:history_idx>', views.get_history_detail)
+    path('history_detail/<int:history_idx>', views.get_history_detail),
 ]
